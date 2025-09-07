@@ -14,12 +14,36 @@ const app = express();
 const port = process.env.PORT || 3001;
 const databaseURL = process.env.DATABASE_URL;
 
-app.use(cors({
-    origin: [process.env.ORIGIN],
-    methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
-    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
-    credentials:true
-}));
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || "")
+    .split(",")
+    .map(o => o.trim())
+    .filter(Boolean);
+
+const corsOptions = {
+    origin: function (origin, callback) {
+        // Allow non-browser tools with no Origin header (e.g., curl, health checks)
+        if (!origin) return callback(null, true);
+        if (allowedOrigins.includes(origin)) return callback(null, true);
+        return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: [
+        "Content-Type",
+        "Origin",
+        "X-Requested-With",
+        "Accept",
+        "Authorization",
+        "x-client-key",
+        "x-client-token",
+        "x-client-secret"
+    ]
+};
+
+app.use(cors(corsOptions));
+// Explicitly handle preflight for all routes
+app.options("*", cors(corsOptions));
+
 
 
 app.use("/uploads/profiles", express.static("uploads/profiles"))
