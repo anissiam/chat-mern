@@ -1,8 +1,3 @@
-/**
- * all code same like
- * https://github.com/AnkitChemjong/Chat-App-2.0
- * use this repo to generate code
- */
 import express from 'express';
 import dotenv from "dotenv";
 import cors from 'cors';
@@ -22,7 +17,8 @@ const databaseURL = process.env.DATABASE_URL;
 app.use(cors({
     origin: [process.env.ORIGIN],
     methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
-    credentials:true
+    credentials:true,
+    optionSuccessStatus:200,
 }));
 
 app.use("/uploads/profiles", express.static("uploads/profiles"))
@@ -30,6 +26,7 @@ app.use("/uploads/files", express.static("uploads/files"))
 
 app.use(cookieParser());
 app.use(express.json());
+app.use(cors(corsOptions))
 
 app.get('/',(req,res)=>{
     res.send("Running")
