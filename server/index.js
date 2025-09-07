@@ -14,14 +14,19 @@ const app = express();
 const port = process.env.PORT || 3001;
 const databaseURL = process.env.DATABASE_URL;
 
-app.use(cors());
+app.use(cors({
+    origin: [process.env.ORIGIN],
+    methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
+    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
+    credentials:true
+}));
+
 
 app.use("/uploads/profiles", express.static("uploads/profiles"))
 app.use("/uploads/files", express.static("uploads/files"))
 
 app.use(cookieParser());
 app.use(express.json());
-
 
 app.get('/',(req,res)=>{
     res.send("Running")
