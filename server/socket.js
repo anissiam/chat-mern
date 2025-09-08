@@ -3,10 +3,14 @@ import Message from "./models/MessageModel.js";
 import Channel from "./models/channelModel.js";
 
 const setupSocket = (server) => {
+    const allowedOrigins = [
+        "http://localhost:5173",
+        "https://chat-mern-front-nine.vercel.app"
+    ];
     const io = new SocketIOServer(server,
         {
             cors: {
-                origin: process.env.ORIGIN,
+                origin: allowedOrigins,
                 credentials: true,
                 methods: ['GET','POST']
             }

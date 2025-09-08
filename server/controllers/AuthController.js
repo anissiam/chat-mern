@@ -6,7 +6,8 @@ const maxAge = 1000 * 60 * 60 * 24 * 3;
 
 
 const createToken = (email, userId) => {
-    return jwt.sign({email,userId}, process.env.JWT_KEY, {expiresIn: maxAge})
+    return jwt.sign({email,userId}, process.env.JWT_KEY, {expiresIn: maxAge
+    })
 }
 
 export const signup = async (req, res) => {
@@ -20,15 +21,16 @@ export const signup = async (req, res) => {
 
         res.cookie('jwt',createToken(email,user.id),{
             maxAge,
-            secure:true,
-            sameSite: 'none',
+            httpOnly: true,    // الكوكي ماينعرضش للـ JS في المتصفح
+            secure: true,      // لازم على https (Vercel / Render)
+            sameSite: "none"   // عشان الكوكي يشتغل عبر دومينات مختلفة
         })
 
         return res.status(201).json(
             {user:{id:user.id,
-                email:user.email,
-                profileSetup:user.profileSetup}
-            ,message: 'User created successfully'}
+                    email:user.email,
+                    profileSetup:user.profileSetup}
+                ,message: 'User created successfully'}
         )
     }catch (err){
         console.log(err)
@@ -57,18 +59,19 @@ export const login = async (req, res) => {
 
         res.cookie('jwt',createToken(email,user.id),{
             maxAge,
-            secure:true,
-            sameSite: 'none',
+            httpOnly: true,    // الكوكي ماينعرضش للـ JS في المتصفح
+            secure: true,      // لازم على https (Vercel / Render)
+            sameSite: "none"   // عشان الكوكي يشتغل عبر دومينات مختلفة
         })
 
         return res.status(200).json(
             {user:{id:user.id,
                     email:user.email,
                     profileSetup:user.profileSetup,
-                firstName :user.firstName,
-                lastName :user.lastName,
-                image:user.image,
-                color:user.color}
+                    firstName :user.firstName,
+                    lastName :user.lastName,
+                    image:user.image,
+                    color:user.color}
                 ,message: 'User found successfully'}
         )
     }catch (err){
@@ -158,9 +161,9 @@ export const removeProfileImage = async (req,res)=>{
             return res.status(404).json({message: 'User not found'});
         }
 
-       if (user.image){
-           unlinkSync(user.image);
-       }
+        if (user.image){
+            unlinkSync(user.image);
+        }
         user.image = null;
         await user.save();
 
@@ -178,7 +181,9 @@ export const removeProfileImage = async (req,res)=>{
 export const logout = async (req,res)=>{
     try {
 
-        res.cookie('jwt','',{maxAge:1 , secure:true, sameSite: 'None'});
+        res.cookie('jwt','',{maxAge:1, httpOnly: true,    // الكوكي ماينعرضش للـ JS في المتصفح
+            secure: true,      // لازم على https (Vercel / Render)
+            sameSite: "none"});
 
         return res.status(200).json(
             {message: 'Logout successfully'}

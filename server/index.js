@@ -14,19 +14,27 @@ const app = express();
 const port = process.env.PORT || 3001;
 const databaseURL = process.env.DATABASE_URL;
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://chat-mern-front-nine.vercel.app"
+];
+
 app.use(cors({
-    origin: [process.env.ORIGIN],
-    methods: ["GET", "POST", "PUT","PATCH", "DELETE"],
-    allowedHeaders: ['Content-Type', 'Origin', 'X-Requested-With', 'Accept', 'x-client-key', 'x-client-token', 'x-client-secret', 'Authorization'],
-    credentials:true
+    origin: allowedOrigins,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE"],
+    credentials: true
 }));
-
-
-app.use("/uploads/profiles", express.static("uploads/profiles"))
-app.use("/uploads/files", express.static("uploads/files"))
+/*app.options("*", cors({
+    origin: allowedOrigins,
+    credentials: true
+}));*/
 
 app.use(cookieParser());
+
 app.use(express.json());
+app.use("/uploads/profiles", express.static("uploads/profiles"))
+
+app.use("/uploads/files", express.static("uploads/files"))
 
 app.get('/',(req,res)=>{
     res.send("Running")
@@ -44,6 +52,6 @@ const server =app.listen(port,()=>{
 setupSocket(server);
 mongoose.connect(databaseURL).then(()=> {
     console.log("Connected to database")})
-.catch(err=>{
-    console.log(err.message)
-})
+    .catch(err=>{
+        console.log(err.message)
+    })
